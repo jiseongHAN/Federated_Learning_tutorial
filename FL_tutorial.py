@@ -87,22 +87,28 @@ if __name__ == "__main__":
     train_local_models(models, train_data_loader)
 
     # Get average weight from local models. and Update global model.
+    gloabl_beofre = copy.deepcopy(global_model)
     global_model.load_state_dict(get_avg_weight(models))
 
     # Test global and Local model.
     local_correct = [0] * num_model
     global_correct = 0
+    global_before_correct = 0
     test_data_loader = torch.utils.data.DataLoader(
         test_dataset, batch_size=64, shuffle=False
     )
 
     for img, label in test_data_loader:
         global_correct += (global_model(img).argmax(1) == label).numpy().sum()
+        global_before_correct += (gloabl_beofre(img).argmax(1) == label).numpy().sum()
+
         for i in range(num_model):
             local_correct[i] = (
                 local_correct[i] + (models[i](img).argmax(1) == label).numpy().sum()
             )
 
     global_acc = global_correct / len(test_dataset)
+    global_before_acc = global_before_correct / len(test_dataset)
     local_acc = [local_correct[i] / len(test_dataset) for i in range(num_model)]
-    print(f"Global Accuracy: {global_acc}, Locals Accuracy: {local_acc}")
+    print(f"Global Accuracy: {global_acc}, Global_before Accuracy: {global_before_acc}")
+    print(f"Locals Accuracy: {local_acc}")

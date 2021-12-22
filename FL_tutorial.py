@@ -3,7 +3,6 @@
 import copy
 from collections import deque
 
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -55,7 +54,9 @@ def train_local_models(models, data_loader, n_train=15):
         model.optimizer.step()
         losses.append(loss.item())
         if idx == 9:
-            print(f"Model Average Loss: {sum(losses) / len(losses):.2f}",)
+            print(
+                f"Model Average Loss: {sum(losses) / len(losses):.2f}",
+            )
 
         if i > len(models) * n_train:
             break
